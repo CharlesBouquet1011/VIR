@@ -83,7 +83,7 @@ Le site enregistre les statistiques des requêtes effectués dans un fichier nom
 >
 > Pour monter un volume avec docker, on utilise le paramètre `--volume <v-name>:<mount-path>` avec `v-name` le nom souhaité pour le volume, et `mount-path` le chemin auquel le volume sera rattaché à l'intérieur du conteneur.
 >
-> Plus d'informations sur les #link("https://docs.docker.com/engine/storage/volumes/", "volumes ici"). Il est aussi possible de partager un dossier avec un conteneur via des #link("https://docs.docker.com/engine/storage/bind-mounts/")[_bind mounts_]
+> Plus d'informations sur les [volumes ici](https://docs.docker.com/engine/storage/volumes/). Il est aussi possible de partager un dossier avec un conteneur via des [_bind mounts_](https://docs.docker.com/engine/storage/bind-mounts/")
 
 - Lancer un conteneur avec un volume nommé `app_data` qui stockera le
   contenu du dossier `/app` (qui contient le fichier
@@ -151,3 +151,34 @@ En vous aidant du Readme.md de CustomDB modifier le Dockerfile pour :
 - Installer les dépendances pour compiler CustomDB
 - Compiler le CustomDB.c pour produire l'exécutable CustomDB
 - Tagger avec la version : `docker build . -t website:v2`
+
+- Vérifiez que tout fonctionne (fichier `queried_names.txt` est bien créé)
+
+
+- docker build . -t website:v2 -> Certaines étapes, voire toutes, sont mise en cache `using cached`...
+
+> [!NOTE]
+> 
+> **Layers**
+>
+> TODO remplir
+>
+>Une image docker ressemble à un mille-feuille : chaque ligne dans votre Dockerfile crée un nouvel étage ou _layer_. Chaque _layer_ représente un ensemble de modifications (ajout, suppression, modification) apportés à l'image.
+
+- Modifier le fichier "Readme.md", et relancer la création d'une image. Verifier que l'étape `COPY . .` est bien relancée, ainsi que les étapes suivantes. Est-ce pertinent de relancer l'installation des paquets python pour une modification du Readme ?
+
+- Modifier le Dockerfile de manière à ce que l'installation des paquets python `pip install ...` ne soit relancée que si le fichier `requirements.txt` est mis à jour.
+
+
+# BONUS
+
+- Add an HealthCheck to your website : https://docs.docker.com/reference/dockerfile/#healthcheck
+- Do not expose port manually, instead use the EXPOSE command : https://docs.docker.com/reference/dockerfile/#expose et https://docs.docker.com/get-started/docker-concepts/running-containers/publishing-ports/
+- Run performance tests on the V1 and V2 versions <TODO quels outils ?  >
+
+
+# TODO TP
+
+- [ ] Ecrire documentation CustomDB
+- [ ] Traduire et rédiger Partie II : Création d'image
+- [ ] Regarder les outils de stress test simples d'utilisation qui existent

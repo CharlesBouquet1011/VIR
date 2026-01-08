@@ -1,3 +1,3 @@
 
-customDbExe: superDb.c
-	gcc $< -o customDbExe
+superDbExe: superDb.c
+	gcc $< -o superDbExe
