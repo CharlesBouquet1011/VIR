@@ -2,34 +2,49 @@
 # TP1 - Docker
 
 Objectif du TP :
-- Prendre en main les commandes usuelles de Docker
-- Être capable de concevoir une image Docker
+- :dart: Prendre en main les commandes usuelles de Docker
+- :dart: Être capable de concevoir une image Docker
 
 ## Partie I : Conteneurs
 
 Vous êtes en charge du déploiement d'un site web.
-Ce site assez simple demande à l'utilisateur d'entrer le pseudonyme d'un joueur Minecraft. Le site affiche ensuite la tête du joueur en question, et enregistre la requête dans un fichier json : `queried_names.json`.
+Ce site assez simple demande à l'utilisateur d'entrer le pseudonyme d'un joueur Minecraft. 
 
-Le dossier `website` contient le code du site web (`flask_minimal.py`), un fichier Readme, ainsi qu'un Dockerfile.
+![Main page](figures/index.png)
+
+Le site affiche ensuite la tête du joueur en question, et enregistre la requête dans un fichier json : `queried_names.json`. Par défaut, le site écoute sur le port 5000.
+
+![Display skin page](figures/display_skin.png)
+
+Le dossier `website` contient le code du site web (`flask_minimal.py`), la liste des dépendances du site (`requirements.txt`), ainsi qu'un Dockerfile.
 
 Ce fichier `Dockerfile` permet la construction de l'image Docker qui servira de modèle pour la création de conteneurs. Nous reviendrons plus tard sur le contenu de ce fichier.
 
-> [!NOTE] **Docker, images et conteneurs**
->  Docker permet l'exécution de processus de manière isolée dans des #strong[conteneurs]. Ces conteneurs sont dits _self-contained_, c'est à dire qu'ils contiennent toutes les dépendances nécessaire à l'exécution du processus.
-
-> Une #strong[image] Docker est un ensemble de fichiers, bibliothèques, binaires et de configurations qui sert de modèle pour la création d'un conteneur.
-
+> [!NOTE] 
+>
+> **Docker, images et conteneurs**
+>
+>  Docker permet l'exécution de processus de manière isolée dans des **conteneurs**. Ces conteneurs sont dits _self-contained_, c'est à dire qu'ils contiennent toutes les dépendances nécessaire à l'exécution du processus.
+>
+> Une **image** Docker est un ensemble de fichiers, bibliothèques, binaires et de configurations qui sert de modèle pour la création d'un conteneur.
+>
 > Dans le cas de notre application web, notre image contiendra toutes les dépendances (python, paquets pythons, code de l'application). Notre conteneur utilisera cette image pour exécuter un processus : notre serveur web.
 
 ### Construire une image et lancer un conteneur
+
+Dans le répertoire `website`
 
 - Lancer `docker build . -t website` pour construire une image nommée `website` à partir du `Dockerfile`.
 - Avec `docker image list`, vérifier que l'image existe bien.
 - Lancer `docker run website`, pour créer un conteneur à partir de l'image `website`. Le serveur devrait se lancer et écouter sur le port 5000 (`running on http://<ip>:5000`).
 
-> [!NOTE] **Redirection de ports**
+> [!NOTE] 
+>
+>  **Redirection de ports**
+>
 > Si vous essayez d'accéder au site web depuis votre ordinateur, cela ne fonctionnera pas. Le serveur web écoute bien sur le port 5000, mais il est uniquement accessible au sein du réseau docker, et pas depuis votre machine hôte (pour vous en convaincre, vous pouvez regarder les ports actifs sur votre machine avec `netstat -tln`).
-> Pour rendre le serveur accessible depuis l'extérieur du conteneur, il est nécessaire faire une redirection de port (#emph[port-forwarding] en anglais). //L'objectif est que le réseau trafic entrant sur le port 5000 de notre machine soit redirigé vers le port 5000 du conteneur. Pour cela, on doit relancer notre conteneur.
+>
+> Pour rendre le serveur accessible depuis l'extérieur du conteneur, il est nécessaire faire une redirection de port (_port-forwarding_ en anglais). L'objectif est que le réseau trafic entrant sur le port 5000 de notre machine soit redirigé vers le port 5000 du conteneur. Pour cela, on doit relancer notre conteneur.
 
 - Arrêter le conteneur Ctrl-c
 - Relancer le conteneur en arrière plan (option `-d`), en ajoutant la redirection de port :  `docker run -d -p 5000:5000 website`.
@@ -55,16 +70,20 @@ Le site enregistre les statistiques des requêtes effectués dans un fichier nom
 
 - Démarrer un nouveau conteneur : `docker run -d -p 5000:5000 website`. Est-ce que le fichier `queried_names.json` est toujours présent dans le conteneur ?
 
+> [!NOTE]
+>
 > **Stockage persistent : les volumes**
+>
 > Par défaut, chaque conteneur docker a son propre système de fichier, qui est supprimé en même temps que le conteneur. C'est une limitation dans plusieurs cas :
 > - Lorsque l'on souhaite sauvegarder des données entre deux exécutions d'un conteneur, comme dans notre cas avec le fichier `queried_names.json`
 > - Lorsque l'on souhaite partager des données entre plusieurs conteneurs.
+>
 > Pour résoudre ces problèmes, on utilise des _volumes_.
   Les volumes sont des stockages persistants, gérés par docker. Par défaut, le contenu d'un volume est stocké sous la forme dans un dossier sur votre machine (usuellement `~/.local/share/containers/storage/volumes`), mais il peut aussi être hebergé ailleurs (NFS, Amazon S3,...).
-
+>
 > Pour monter un volume avec docker, on utilise le paramètre `--volume <v-name>:<mount-path>` avec `v-name` le nom souhaité pour le volume, et `mount-path` le chemin auquel le volume sera rattaché à l'intérieur du conteneur.
-
-> Plus d'informations sur les #link("https://docs.docker.com/engine/storage/volumes/", "volumes ici"). Il est aussi possible de partager un dossier avec un conteneur via des #link("https://docs.docker.com/engine/storage/bind-mounts/")[_bind mounts_]
+>
+> Plus d'informations sur les [volumes ici](https://docs.docker.com/engine/storage/volumes/). Il est aussi possible de partager un dossier avec un conteneur via des [_bind mounts_](https://docs.docker.com/engine/storage/bind-mounts/")
 
 - Lancer un conteneur avec un volume nommé `app_data` qui stockera le
   contenu du dossier `/app` (qui contient le fichier
@@ -75,4 +94,93 @@ Le site enregistre les statistiques des requêtes effectués dans un fichier nom
   l'arrêt du conteneur)
 - Lancer un nouveau conteneur, toujours avec le même volume. Est-ce que le fichier `queried_names.json` est toujours présent dans le conteneur ?
 
-:checkmark: Le site web est déployé, et ses données persistées !
+:white_check_mark: Le site web est déployé, et ses données persistées !
+
+## Partie II : Création d'images
+
+L'équipe de développement s'est rendu compte des limitations d'utiliser un fichier json comme base de donnée. 
+Il ont donc sorti une nouvelle version du site web, qui utilise une base de donnée maison :"SuperDB".
+Cette fois ci, c'est à vous de créer l'image Docker.
+
+Let's decypher the current Dockerfile step by step, understanding each component:
+
+```dockerfile
+# Start with a base image
+FROM python:3.14-slim
+```
+
+This line selects our foundation. Think of it as choosing the operating system and core tools. We use python:3.14-slim because it:
+- Includes Python 3.14 pre-installed
+- Contains essential Linux tools
+- Maintains a relatively small size
+
+```dockerfile
+# Set up our working directory
+WORKDIR /app
+
+# Copy the application content COPY <src> <dst>
+COPY . .
+
+# Install the Python packages we need
+RUN pip install -r requirements.txt
+```
+
+We first copy the content of the current folder (Readme.md, flask_minimal.py, ...) into the app/ folder in the image. 
+
+Then, we install the dependancies for our python app, listed in the `requirements.txt` file.
+
+```dockerfile
+# Tell Flask which application to run
+ENV FLASK_APP=flask_minimal.py
+
+# Specify the command to start our application
+CMD ["flask", "run", "--host=0.0.0.0"]
+```
+
+This sets up:
+- Environment variables Flask needs
+- The command to start our application
+- Network access from outside the container
+
+# À vous de jouer !
+
+La nouvelle version du site web est dans le répertoire `website-v2`.
+
+Les source du logiciel "SuperDB" sont dans le répertoire CustomDB.
+En vous aidant du Readme.md de CustomDB modifier le Dockerfile pour :
+- Installer les dépendances pour compiler CustomDB
+- Compiler le CustomDB.c pour produire l'exécutable CustomDB
+- Tagger avec la version : `docker build . -t website:v2`
+
+- Vérifiez que tout fonctionne (fichier `queried_names.txt` est bien créé)
+
+
+- docker build . -t website:v2 -> Certaines étapes, voire toutes, sont mise en cache `using cached`...
+
+> [!NOTE]
+> 
+> **Layers**
+>
+> TODO remplir
+>
+>Une image docker ressemble à un mille-feuille : chaque ligne dans votre Dockerfile crée un nouvel étage ou _layer_. Chaque _layer_ représente un ensemble de modifications (ajout, suppression, modification) apportés à l'image.
+
+- Modifier le fichier "Readme.md", et relancer la création d'une image. Verifier que l'étape `COPY . .` est bien relancée, ainsi que les étapes suivantes. Est-ce pertinent de relancer l'installation des paquets python pour une modification du Readme ?
+
+- Modifier le Dockerfile de manière à ce que l'installation des paquets python `pip install ...` ne soit relancée que si le fichier `requirements.txt` est mis à jour.
+
+
+# BONUS
+
+- Add an HealthCheck to your website : https://docs.docker.com/reference/dockerfile/#healthcheck
+- Do not expose port manually, instead use the EXPOSE command : https://docs.docker.com/reference/dockerfile/#expose et https://docs.docker.com/get-started/docker-concepts/running-containers/publishing-ports/
+- Run performance tests on the V1 and V2 versions <TODO quels outils ?  >
+- Mettre en place de l'intégration continue : faire un fork de ce dépôt sur github ou gitlab, et faire en sorte que chaque nouveau commit sur `main` déclenche la création de l'image docker de website. 
+  - Sur github, en utilisant les github actions : [https://docs.github.com/en/actions/get-started/understand-github-actions](https://docs.github.com/en/actions/get-started/understand-github-actions)
+  - Sur gitlab, en utilisant une pipeline de CI/CD : [https://docs.gitlab.com/ci/](https://docs.gitlab.com/ci/)
+
+# TODO TP
+
+- [ ] Ecrire documentation CustomDB
+- [ ] Traduire et rédiger Partie II : Création d'image
+- [ ] Regarder les outils de stress test simples d'utilisation qui existent
