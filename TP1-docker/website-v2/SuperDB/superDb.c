@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define DATABASE_FILE_NAME "queried_name.txt"
+#define DATABASE_FILE_NAME "queried_names.txt"
 
 // Return 1 if string starts with substring, 0 else
 int starts_with(char *substring, char *string)

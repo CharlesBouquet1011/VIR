@@ -1,3 +1,0 @@
-- Ajouter dépendances
-- Ajouter information de build
-- Ajouter information sur le binaire produit

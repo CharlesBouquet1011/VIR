@@ -5,7 +5,7 @@ WORKDIR /app
 
 COPY . .
 
-# Add instructions to build the CustomDB binary
+# Add instructions to build the SuperDB binary
 
 RUN pip install -r requirements.txt
 

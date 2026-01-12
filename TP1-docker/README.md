@@ -98,19 +98,15 @@ Le site enregistre les statistiques des requêtes effectués dans un fichier nom
 > - Lorsque l'on souhaite partager des données entre plusieurs conteneurs.
 >
 > Pour résoudre ces problèmes, on utilise des _volumes_.
-  Les volumes sont des stockages persistants, gérés par docker. Par défaut, le contenu d'un volume est stocké sous la forme dans un dossier sur votre machine (usuellement `~/.local/share/containers/storage/volumes`), mais il peut aussi être hebergé ailleurs (NFS, Amazon S3,...).
+  Les volumes sont des stockages persistants, gérés par docker. Par défaut, le contenu d'un volume est stocké sous la forme dans un dossier sur votre machine (usuellement `~/.local/share/containers/storage/volumes`), mais il peut aussi être hebergé ailleurs (serveur NFS, Amazon S3,...).
 >
 > Pour monter un volume avec docker, on utilise le paramètre `--volume <v-name>:<mount-path>` avec `v-name` le nom souhaité pour le volume, et `mount-path` le chemin auquel le volume sera rattaché à l'intérieur du conteneur.
 >
 > Plus d'informations sur les [volumes ici](https://docs.docker.com/engine/storage/volumes/). Il est aussi possible de partager un dossier avec un conteneur via des [_bind mounts_](https://docs.docker.com/engine/storage/bind-mounts/")
 
-- Lancer un conteneur avec un volume nommé `app_data` qui stockera le
-  contenu du dossier `/app` (qui contient le fichier
-  `queried_names.json`)
-- Rechercher quelques nom d'utilisateurs, pour ajouter des statistiques à
-  `queried_names.json`
-- Supprimer le conteneur `docker rm -f <nom conteneur>` (`-f` permet de forcer
-  l'arrêt du conteneur)
+- Lancer un conteneur avec un volume nommé `app_data` qui stockera le contenu du dossier `/app` (qui contient le fichier `queried_names.json`)
+- Rechercher quelques nom d'utilisateurs, pour ajouter des statistiques à `queried_names.json`
+- Supprimer le conteneur `docker rm -f <nom conteneur>` (`-f` permet de forcer l'arrêt du conteneur)
 - Lancer un nouveau conteneur, toujours avec le même volume. Est-ce que le fichier `queried_names.json` est toujours présent dans le conteneur ?
 
 :white_check_mark: Le site web est déployé, et ses données persistées !
@@ -118,35 +114,43 @@ Le site enregistre les statistiques des requêtes effectués dans un fichier nom
 ## Partie II : Création d'images
 
 L'équipe de développement s'est rendu compte des limitations d'utiliser un fichier json comme base de donnée. 
-Il ont donc sorti une nouvelle version du site web, qui utilise une base de donnée maison :"SuperDB".
+Ils ont donc sorti une nouvelle version du site web, qui utilise une base de donnée maison :"SuperDB".
 Cette fois ci, c'est à vous de créer l'image Docker.
 
-Let's decypher the current Dockerfile step by step, understanding each component:
+## Anatomie d'une Image Docker
+
+### Choix d'une image de base
+
+Pour commencer, déchiffrons le `Dockerfile` actuel, étape par étape :
 
 ```dockerfile
 # Start with a base image
 FROM python:3.14-slim
 ```
 
-This line selects our foundation. Think of it as choosing the operating system and core tools. We use python:3.14-slim because it:
-- Includes Python 3.14 pre-installed
-- Contains essential Linux tools
-- Maintains a relatively small size
+Un Dockerfile commence toujours par la même instruction `FROM <image>`. 
+Cette ligne permet de spécifier une image de base, qui servira de fondation pour notre nouvelle image. Cette image de base contient un système d'exploitation et des outils essentiels. Ici, nous utiliserons l'image `python:3-14-slim`, une distribution linux très légère qui inclus Python.
+
+### Installation des dépendances 
+
+La suite du `Dockerfile` s'intéresse à l'installation des dépendances :
 
 ```dockerfile
+# Copy the application content COPY <src> <dst>
+COPY . /app
+
 # Set up our working directory
 WORKDIR /app
-
-# Copy the application content COPY <src> <dst>
-COPY . .
 
 # Install the Python packages we need
 RUN pip install -r requirements.txt
 ```
 
-We first copy the content of the current folder (Readme.md, flask_minimal.py, ...) into the app/ folder in the image. 
+Tout d'abord, on copie le contenu du dossier actuel (requirements.txt, flask_minimal.py, ...) dans le dossier `app/` de notre image. 
+Ensuite, on définit `/app` comme dossier courant. Cela équivaut à faire un `cd /app`.
+Enfin, on installe les dépendances de notre application python, listées dans le fichier `requirements.txt`.
 
-Then, we install the dependancies for our python app, listed in the `requirements.txt` file.
+### Configuration 
 
 ```dockerfile
 # Tell Flask which application to run
@@ -156,40 +160,55 @@ ENV FLASK_APP=flask_minimal.py
 CMD ["flask", "run", "--host=0.0.0.0"]
 ```
 
-This sets up:
-- Environment variables Flask needs
-- The command to start our application
-- Network access from outside the container
+Pour définir des variable d'environnement nécessaires à l'application, on utiliser l'instruction `ENV`. Ici, on définit la variable `FLASK_APP` utilisée par le framework web Flask pour savoir quelle application lancer.
+
+Enfin, on définit la commande qui sera utilisée pour lancer notre application, ici `flask run --host=0.0.0.0`.
+
+## Comprendre les layers
+
+> [!NOTE]
+> 
+> **Construction d'image et _layers_**
+> 
+> La construction d'une image docker s'effectue par l'ajout de couches ou _layers_, à l'image de base.
+> Chaque _layer_ représente un ensemble de modifications (ajout, suppression, modification) apportées au _layer_ précédent.
+>
+> Par exemple, pour notre image
+> - la couche correspondant à l'instruction `COPY` ajoute 4 fichiers à l'image de base.
+> - la couche `RUN pip install ...` utilise le fichier `requirements.txt` apportés par la couche `COPY`
+> 
+> ![Couches de notre image](figures/layers.png)
+> 
+> À noter que l'image `python` que l'on utilise est elle-même dérivée d'une image de base `debian`, à laquelle on a ajouté plusieurs couches correspondant à l'installation de Python.
+> 
+
+Pour éviter d'avoir à reconstruire l'entièreté de l'image à chaque  `docker build .`, Docker garde en cache les différentes couches.
+
+- Relancer la construction de l'image : docker vous informe qu'il utilise les couches déjà construites avec `Using cache ...` 
+
+- Modifier le fichier "Readme.md" dans `website`, et relancer la création d'une image. 
+
+La construction de la couche `COPY . .` est relancée car un des fichiers copiés est modifié. Dans ce cas, les couchent suivantes, qui dépendent de `COPY`, sont relancées.  Est-ce pertinent de relancer l'installation des paquets python pour une modification du Readme ?
+
+- Modifier le Dockerfile de manière à ce que l'installation des paquets python (couche `RUN pip install ...`) ne soit relancée que si le fichier `requirements.txt` est mis à jour.
+
 
 # À vous de jouer !
 
 La nouvelle version du site web est dans le répertoire `website-v2`.
 
 Les source du logiciel "SuperDB" sont dans le répertoire CustomDB.
-En vous aidant du Readme.md de CustomDB modifier le Dockerfile pour :
-- Installer les dépendances pour compiler CustomDB
-- Compiler le CustomDB.c pour produire l'exécutable CustomDB
-- Tagger avec la version : `docker build . -t website:v2`
+En vous aidant du `Readme.md` de `website-v2` modifier le Dockerfile pour :
+- Installer les dépendances pour compiler SuperDB
+- Compiler le superDb.c pour produire l'exécutable superDBExe
+- Construire la nouvelle image, et la tagger `v2` : `docker build . -t website:v2`
+- Une fois l'image conçue, vérifier que tout fonctionne : le site démarre, fonctionne, et le fichier `queried_names.txt` est bien créé.
 
-- Vérifiez que tout fonctionne (fichier `queried_names.txt` est bien créé)
-
-
-- docker build . -t website:v2 -> Certaines étapes, voire toutes, sont mise en cache `using cached`...
-
-> [!NOTE]
-> 
-> **Layers**
->
-> TODO remplir
->
->Une image docker ressemble à un mille-feuille : chaque ligne dans votre Dockerfile crée un nouvel étage ou _layer_. Chaque _layer_ représente un ensemble de modifications (ajout, suppression, modification) apportés à l'image.
-
-- Modifier le fichier "Readme.md", et relancer la création d'une image. Verifier que l'étape `COPY . .` est bien relancée, ainsi que les étapes suivantes. Est-ce pertinent de relancer l'installation des paquets python pour une modification du Readme ?
-
-- Modifier le Dockerfile de manière à ce que l'installation des paquets python `pip install ...` ne soit relancée que si le fichier `requirements.txt` est mis à jour.
-
+:white_check_mark: La version 2 du site web est déployée !
 
 # BONUS
+
+Si vous souhaitez améliorer l'image actuelle, vous pouvez accomplir ces tâches secondaires : 
 
 - Add an HealthCheck to your website : https://docs.docker.com/reference/dockerfile/#healthcheck
 - Do not expose port manually, instead use the EXPOSE command : https://docs.docker.com/reference/dockerfile/#expose et https://docs.docker.com/get-started/docker-concepts/running-containers/publishing-ports/
@@ -200,10 +219,7 @@ En vous aidant du Readme.md de CustomDB modifier le Dockerfile pour :
 
 # TODO TP
 
-- [ ] Ecrire documentation CustomDB
-- [ ] Traduire et rédiger Partie II : Création d'image
 - [ ] Regarder les outils de stress test simples d'utilisation qui existent
-  
 
 # Liste des commandes utiles
 ```
