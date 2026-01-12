@@ -2,8 +2,27 @@
 # TP1 - Docker
 
 Objectif du TP :
+- :dart: Connaitre les premières commandes linux système
 - :dart: Prendre en main les commandes usuelles de Docker
 - :dart: Être capable de concevoir une image Docker
+
+## Partie 0 : Prérequis
+### Environnnement de travail
+Vous allez réaliser une série de TP liés à la contenerisation et la virtualisation en utilisant des outils comme podman et kubernetes. Nous vous demandons d'utiliser un environnement générique commun qui est celui des clés debian étudiées en PIT. Pour travailler, nous vous demandons d'utiliser l'image iso que vous pouvez récupérer avec la commande suivante : `wget https://tc-net.insa-lyon.fr/iso/k3s/2025-k3s.iso`. Cette image doit avoir été flashée sur une clé usb avant la séance. Vous l'aurez également au préalable testé sur votre machine et particulièrement avec une connexion eduroam fonctionnelle. Pour les sauvegardes des configurations vous pouvez monter votre répertoire home partagé de l'INSA dans l'espace de la clé. Lorsque vous booterez la clé, l'intégralité des opérations se fait en mémoire vive de votre machine.   
+
+### Compétences unix
+Une fois que votre environnement est démarré, vous devez savoir faire les choses suivantes : 
+ - Vérifier qu'un processus de nom <unNom> est actif ou inactif sur votre machine
+ - Tuer un processus spécifique et tous ses fils
+ - Tuer un processus spécifique directement
+ - Verifier l'état d'usage d'un port réseau spécifique de votre machine
+ - Vérifier qu'un port spécifique soit bien utilisé par un processus de votre machine
+ - Installer un logiciel standard
+ - Connaitre la quantité d'espace mémoire restant
+ - Manipuler git
+
+Ces actions correspondent à des commandes linux. Lesquelles ?
+Vous pouvez maintenant cloner le projet git https://github.com/hreymond/VIR et vous rendre dans le repertoire TP1-Docker.
 
 ## Partie I : Conteneurs
 
@@ -24,25 +43,25 @@ Ce fichier `Dockerfile` permet la construction de l'image Docker qui servira de 
 >
 > **Docker, images et conteneurs**
 >
->  Docker permet l'exécution de processus de manière isolée dans des **conteneurs**. Ces conteneurs sont dits _self-contained_, c'est à dire qu'ils contiennent toutes les dépendances nécessaire à l'exécution du processus.
+>  Docker ou son équivalent opensource `podman` permet l'exécution de processus de manière isolée dans des **conteneurs**. Ces conteneurs sont dits _self-contained_, c'est à dire qu'ils contiennent toutes les dépendances nécessaire à l'exécution des processus du conteneur. Les conteneurs peuvent executer plusieurs processus concurrents ou bien un seul. 
+> 
+> Une **image** est un ensemble de fichiers, bibliothèques, binaires et de configurations qui servent de modèle pour la création d'un conteneur.
 >
-> Une **image** Docker est un ensemble de fichiers, bibliothèques, binaires et de configurations qui sert de modèle pour la création d'un conteneur.
->
-> Dans le cas de notre application web, notre image contiendra toutes les dépendances (python, paquets pythons, code de l'application). Notre conteneur utilisera cette image pour exécuter un processus : notre serveur web.
+> Dans le cas de notre application web, notre image contient toutes les dépendances (python, paquets pythons, code de l'application). Notre conteneur utilise cette image pour exécuter un processus : notre serveur web.
 
 ### Construire une image et lancer un conteneur
 
 Dans le répertoire `website`
 
-- Lancer `docker build . -t website` pour construire une image nommée `website` à partir du `Dockerfile`.
-- Avec `docker image list`, vérifier que l'image existe bien.
-- Lancer `docker run website`, pour créer un conteneur à partir de l'image `website`. Le serveur devrait se lancer et écouter sur le port 5000 (`running on http://<ip>:5000`).
+- Lancer `podman build . -t website` pour construire une image nommée `website` à partir du `Dockerfile`.
+- Avec `podman image list`, vérifier que l'image existe bien.
+- Lancer `podman run website`, pour créer un conteneur à partir de l'image `website`. Le serveur devrait se lancer et écouter sur le port 5000 (`running on http://<ip>:5000`).
 
 > [!NOTE] 
 >
 >  **Redirection de ports**
 >
-> Si vous essayez d'accéder au site web depuis votre ordinateur, cela ne fonctionnera pas. Le serveur web écoute bien sur le port 5000, mais il est uniquement accessible au sein du réseau docker, et pas depuis votre machine hôte (pour vous en convaincre, vous pouvez regarder les ports actifs sur votre machine avec `netstat -tln`).
+> Si vous essayez d'accéder au site web depuis votre ordinateur, cela ne fonctionnera pas. Le serveur web écoute bien sur le port 5000, mais il est uniquement accessible au sein du réseau docker, et pas depuis votre machine hôte (pour vous en convaincre, vous pouvez regarder les ports actifs sur votre machine avec `netstat -tlnp`).
 >
 > Pour rendre le serveur accessible depuis l'extérieur du conteneur, il est nécessaire faire une redirection de port (_port-forwarding_ en anglais). L'objectif est que le réseau trafic entrant sur le port 5000 de notre machine soit redirigé vers le port 5000 du conteneur. Pour cela, on doit relancer notre conteneur.
 
@@ -184,3 +203,27 @@ En vous aidant du Readme.md de CustomDB modifier le Dockerfile pour :
 - [ ] Ecrire documentation CustomDB
 - [ ] Traduire et rédiger Partie II : Création d'image
 - [ ] Regarder les outils de stress test simples d'utilisation qui existent
+  
+
+# Liste des commandes utiles
+```
+  ps -ef | grep <NomProg>
+  kill <idProcessus>
+  killall <nomProcessus>
+  kill -9 <idProcessus>
+  killall -9 <nomProcessus>
+
+  netstat -tlnp | grep <portId>
+  lsof -i :5000
+
+  apt install <logiciel>
+
+  top | htop
+  git clone <url>
+```
+
+# Liste des packages contenant des utilitaires utiles
+```
+  netstat --> net-tools
+  ps --> procps
+``` 
