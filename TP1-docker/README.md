@@ -102,6 +102,7 @@ Le site enregistre les statistiques des requêtes effectués dans un fichier nom
 >
 > Pour monter un volume avec docker, on utilise le paramètre `--volume <v-name>:<mount-path>` avec `v-name` le nom souhaité pour le volume, et `mount-path` le chemin auquel le volume sera rattaché à l'intérieur du conteneur.
 >
+> Pour vous aider à manipuler les volumes vous pouvez lancer la commande `podman volume`
 > Plus d'informations sur les [volumes ici](https://docs.docker.com/engine/storage/volumes/). Il est aussi possible de partager un dossier avec un conteneur via des [_bind mounts_](https://docs.docker.com/engine/storage/bind-mounts/")
 
 - Lancer un conteneur avec un volume nommé `app_data` qui stockera le
