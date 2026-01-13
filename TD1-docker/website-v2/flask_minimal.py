@@ -47,5 +47,5 @@ def display_skin():
             """
 
 def update_query_names(username) -> int:
-    process = subprocess.run(["./customDbExe", username])
+    process = subprocess.run(["./SuperDbExe", username])
     return process.returncode
