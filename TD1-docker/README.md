@@ -1,6 +1,6 @@
 # TD1 - Conteneurs
 
-Objectif du TP :
+Objectif du TD :
 - :dart: Connaitre les premières commandes linux système
 - :dart: Prendre en main les commandes usuelles de Docker/Podman
 
@@ -24,7 +24,7 @@ Une fois que votre environnement est démarré, vous devez savoir faire les chos
  - Connaitre la quantité d'espace mémoire restant
  - Manipuler git
 
-Une fois l'environnement de travail démarré, afficher le contenu du fichier `/etc/secretcode` (par exemple, avec la commande `cat`). Ce fichier contient le code à renseigner sur le quiz moodle [Mise en place de l'environnement de travail](https://moodle.insa-lyon.fr/mod/quiz/view.php?id=246067).
+Une fois l'environnement de travail démarré, afficher le contenu du fichier `/etc/codesecret` (par exemple, avec la commande `cat`). Ce fichier contient le code à renseigner sur le quiz moodle [Mise en place de l'environnement de travail](https://moodle.insa-lyon.fr/mod/quiz/view.php?id=246067).
 
 Ces actions correspondent à des commandes linux. Lesquelles ?
 Vous pouvez maintenant cloner le projet git https://github.com/hreymond/VIR et vous rendre dans le repertoire TD1-Docker.
@@ -68,10 +68,10 @@ Dans le répertoire `website`
 >
 > Si vous essayez d'accéder au site web depuis votre ordinateur, cela ne fonctionnera pas. Le serveur web écoute bien sur le port 5000, mais il est uniquement accessible au sein du réseau docker, et pas depuis votre machine hôte (pour vous en convaincre, vous pouvez regarder les ports actifs sur votre machine avec `netstat -tlnp`).
 >
-> Pour rendre le serveur accessible depuis l'extérieur du conteneur, il est nécessaire faire une redirection de port (_port-forwarding_ en anglais). L'objectif est que le réseau trafic entrant sur le port 5000 de notre machine soit redirigé vers le port 5000 du conteneur. Pour cela, on doit relancer notre conteneur.
+> Pour rendre le serveur accessible depuis l'extérieur du conteneur, il est nécessaire faire une redirection de port (_port-forwarding_ en anglais). L'objectif est que le réseau trafic entrant sur le port 6666 de notre machine soit redirigé vers le port 5000 du conteneur. Pour cela, on doit relancer notre conteneur.
 
 - Arrêter le conteneur Ctrl-c
-- Relancer le conteneur en arrière plan (option `-d`), en ajoutant la redirection de port :  `podman run -d -p 5000:5000 website`.
+- Relancer le conteneur en arrière plan (option `-d`), en ajoutant la redirection de port :  `podman run -d -p 5000:6666 website`.
 
 ### Inspecter les conteneurs
 
@@ -82,7 +82,7 @@ Dans le répertoire `website`
 - Vérifiez que le serveur s'est bien lancé : `podman logs <nom du conteneur>`
 - Vérifiez que le port 5000 est bien ouvert sur votre machine : `netstat -tln`
 
-Vous pouvez alors accéder à votre site depuis un navigateur (adresse `http://localhost:5000`).
+Vous pouvez alors accéder à votre site depuis un navigateur (adresse `http://localhost:6666`).
 - Tester le site avec plusieurs pseudos (le votre si vous en avez, sinon `Aypierre` par exemple).
 
 Le site enregistre les statistiques des requêtes effectués dans un fichier nommé `queried_names.json`. Nous allons vérifier que le fichier est bien créé à l'aide de la commande `podman exec`, qui permet d'exécuter une commande au sein d'un conteneur.
@@ -92,7 +92,7 @@ Le site enregistre les statistiques des requêtes effectués dans un fichier nom
 
 ### Persistance des données
 
-- Démarrer un nouveau conteneur : `podman run -d -p 5000:5000 website`. Est-ce que le fichier `queried_names.json` est toujours présent dans le conteneur ?
+- Démarrer un nouveau conteneur : `podman run -d -p 5000:6666 website`. Est-ce que le fichier `queried_names.json` est toujours présent dans le conteneur ?
 
 > [!NOTE]
 >

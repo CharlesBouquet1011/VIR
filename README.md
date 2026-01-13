@@ -4,3 +4,4 @@ Ce dépôt contient les sujets de TP de VIR :
 
 - [TD1-Docker](TD1-docker) Donne les bases sur podman
 - [TD2-Docker](TD2-docker) Fabrication des images
+- [TD3-Multi-conteneurs](TD3-multi-containers) Interaction entre les conteneurs : réseau et docker-compose
