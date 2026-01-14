@@ -1,4 +1,10 @@
 # VIR
+Cette série de TD a pour objectif de couvrir les points clé d'une architecture de datacentre d'exploitation. Le datacentre est consititué de vos propres machines locales que vous démarrez sur une clé indépendante. Toutes les manipulations se font en mémoire et les configurations sont réinitialisées à chaque redémarrage. Nous vous conseillons de travailler en binôme. Une machine servant d'experimentation, l'autre servant d'accès internet, de consultation de code et des sujets. 
+
+La première série de trois séances couvre l'usage de podman pour créer des environnements de conteneneurisation. Podman est une alternative opensource à Docker. Tout ce que vous ferez sur podman est directement reproductible dans docker.    
+
+La seconde série de séances couvre kubernetes avec un outil spécifique k3s, qui est une implantation simple des spécifications Kubernetes.    
+
 
 Ce dépôt contient les sujets de TP de VIR :
 

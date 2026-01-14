@@ -10,7 +10,7 @@ Objectif du TD :
 
 Vous allez réaliser une série de TP liés à la conteneurisation et la virtualisation en utilisant des outils comme podman et kubernetes. Nous vous demandons d'utiliser un environnement générique commun qui est celui des clés debian étudiées en PIT. Pour travailler, nous vous demandons d'utiliser l'image iso que vous pouvez récupérer avec la commande suivante : `wget https://tc-net.insa-lyon.fr/iso/k3s/2025-k3s.iso`.
 
-Cette image doit avoir été flashée sur une clé usb avant la séance. Vous l'aurez également au préalable testé sur votre machine et particulièrement avec une connexion eduroam fonctionnelle. Pour les sauvegardes des configurations vous pouvez monter votre répertoire home partagé de l'INSA dans l'espace de la clé. Lorsque vous booterez la clé, l'intégralité des opérations se fait en mémoire vive de votre machine.
+Cette image doit avoir été flashée sur une clé usb avant la séance. Vous l'aurez également au préalable testé sur votre machine et particulièrement avec une connexion eduroam fonctionnelle. Pour les sauvegardes des configurations vous pouvez monter votre répertoire home partagé de l'INSA dans l'espace de la clé. Lorsque vous booterez la clé, l'intégralité des opérations se fait en mémoire vive de votre machine. Vous devez donc comprendre les deux scripts à la racine de la clé : `./starnet.sh` et `./startmount.sh`.
 
 ### Compétences unix
 
@@ -66,20 +66,29 @@ Dans le répertoire `website`
 >
 >  **Redirection de ports**
 >
-> Si vous essayez d'accéder au site web depuis votre ordinateur, cela ne fonctionnera pas. Le serveur web écoute bien sur le port 5000, mais il est uniquement accessible au sein du réseau docker, et pas depuis votre machine hôte (pour vous en convaincre, vous pouvez regarder les ports actifs sur votre machine avec `netstat -tlnp`).
+> Si vous essayez d'accéder au site web depuis votre ordinateur, cela ne fonctionnera pas. Le serveur web écoute bien sur le port 5000, mais il est uniquement accessible au sein du réseau docker, et pas depuis votre machine hôte (pour vous en convaincre, vous pouvez regarder les ports actifs sur votre machine avec `netstat -tlnp` ou `netstat -tlnp | grep 5000`. Vérifiez dans le `man` à quoi servent les 4 options). 
 >
 > Pour rendre le serveur accessible depuis l'extérieur du conteneur, il est nécessaire faire une redirection de port (_port-forwarding_ en anglais). L'objectif est que le réseau trafic entrant sur le port 6666 de notre machine soit redirigé vers le port 5000 du conteneur. Pour cela, on doit relancer notre conteneur.
 
 - Arrêter le conteneur Ctrl-c
-- Relancer le conteneur en arrière plan (option `-d`), en ajoutant la redirection de port :  `podman run -d -p 5000:6666 website`.
+- Relancer en ajoutant la redirection de port :  `podman run -p 5000:6666 website`.
+
+Testez maintenant votre application. Quelle application utilisez vous ?
+Soyez fin, et testez dans les détails :
+```
+localhost:5000
+localhost:6666
+127.0.0.1:5000
+127.0.0.1:6666
+```
+
+Avez-vous des commentaires, ou remarques ?
 
 ### Inspecter les conteneurs
+- Listez les conteneur actifs : `podman ps | podman container list`, `podman ps -a | podman container list -a`. Il est l'heure de faire du ménage.
+:dart: Un petit secret. Tous les blob sont identifiés par leur sha256... Lorsque vous indiquez un sha, vous n'avez pas besoin d'indiquer à podman le numéro complet. Ainsi s'il n'y a pas de doublons, '6b8a0e3096af4664bd36e73372a2dffc' est pareil que '6b8a0e3096af4' ou '6'. Pensez-y quand vous voulez supprimer des conteneur par leur ids. Pour supprimer un conteneur : `podman rm <id>`.  Supprimez un conteneur en cours d'exécution pour voir ce que cela fait.
 
-- Dans un autre terminal, lancer `podman container list -a`, vérifier
-  que votre conteneur est présent, et à l'état "UP". Noter le nom de votre conteneur.
-  Vous remarquerez que votre précédent conteneur n'a pas été supprimé (status Exited).
-
-- Vérifiez que le serveur s'est bien lancé : `podman logs <nom du conteneur>`
+- Vérifiez que le serveur s'est bien lancé : `podman logs <nom du conteneur | id>`
 - Vérifiez que le port 5000 est bien ouvert sur votre machine : `netstat -tln`
 
 Vous pouvez alors accéder à votre site depuis un navigateur (adresse `http://localhost:6666`).
@@ -124,6 +133,7 @@ Le site enregistre les statistiques des requêtes effectués dans un fichier nom
   killall <nomProcessus>
   kill -9 <idProcessus>
   killall -9 <nomProcessus>
+  cat <nomFichier>
 
   netstat -tlnp | grep <portId>
   lsof -i :5000
@@ -132,6 +142,18 @@ Le site enregistre les statistiques des requêtes effectués dans un fichier nom
 
   top | htop
   git clone <url>
+  curl <url>
+
+  nmcli co list
+  nmcli co delete
+
+  ip addr
+  mount <device> <mountPoint>
+
+  podman run -d -p <portHostExterne:portConteneurInterne> <id>
+  podman <ps | container list>
+  podman <ps -a | container list -a>
+  podman rm <id|name>
 ```
 
 # Liste des packages contenant des utilitaires utiles
