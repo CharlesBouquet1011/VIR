@@ -111,14 +111,16 @@ Le site enregistre les statistiques des requêtes effectués dans un fichier nom
 >
 > **Stockage persistent : les volumes**
 >
-> Par défaut, chaque conteneur docker a son propre système de fichier, qui est supprimé en même temps que le conteneur. C'est une limitation dans plusieurs cas :
+> Par défaut, chaque conteneur a son propre système de fichier, qui est supprimé en même temps que le conteneur. C'est une limitation dans plusieurs cas :
 > - Lorsque l'on souhaite sauvegarder des données entre deux exécutions d'un conteneur, comme dans notre cas avec le fichier `queried_names.json`
 > - Lorsque l'on souhaite partager des données entre plusieurs conteneurs.
 >
-> Pour résoudre ces problèmes, on utilise des _volumes_.
-  Les volumes sont des stockages persistants, gérés par docker. Par défaut, le contenu d'un volume est stocké sous la forme dans un dossier sur votre machine (usuellement `~/.local/share/containers/storage/volumes`), mais il peut aussi être hebergé ailleurs (serveur NFS, Amazon S3,...).
+> Si on ne souhaite pas fabriquer une API de service réseau spécifique, on peut utiliser des _volumes_.
+  Les volumes sont des stockages persistants, gérés par le système. Il y a globalement deux technique utilisant des volumes. La première utilise un 'service' fourni par podman/docker qui permet de créer des espaces partagés. La seconde utilise des espaces partagés 'classiques' mis à disposition par l'hôte. A titre d'illustration, dans ce TD, nous utilisons les `volumes` proposés par podman/docker.   
+  
+  Le contenu d'un volume est stocké sous la forme dans un dossier sur votre machine (usuellement `~/.local/share/containers/storage/volumes`, cf commande `podman info`) 
 >
-> Pour monter un volume avec docker, on utilise le paramètre `--volume <v-name>:<mount-path>` avec `v-name` le nom souhaité pour le volume, et `mount-path` le chemin auquel le volume sera rattaché à l'intérieur du conteneur.
+> Pour utiliser un volume avec docker, on utilise le paramètre `--volume <v-name>:<mount-path>` avec `v-name` le nom souhaité pour le volume, et `mount-path` le chemin auquel le volume sera rattaché à l'intérieur du conteneur.
 >
 > Pour vous aider à manipuler les volumes vous pouvez lancer la commande `podman volume`
 > Plus d'informations sur les [volumes ici](https://docs.docker.com/engine/storage/volumes/). Il est aussi possible de partager un dossier avec un conteneur via des [_bind mounts_](https://docs.docker.com/engine/storage/bind-mounts/")
@@ -129,6 +131,8 @@ Le site enregistre les statistiques des requêtes effectués dans un fichier nom
 - Lancer un nouveau conteneur, toujours avec le même volume. Est-ce que le fichier `queried_names.json` est toujours présent dans le conteneur ?
 
 :white_check_mark: Le site web est déployé, et ses données persistées !
+
+:question: Au fait combien et quels processus tournent dans votre conteneur pour servir votre application web ?
 
 # Liste des commandes utiles
 ```
