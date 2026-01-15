@@ -10,7 +10,7 @@ L'architecture finale sera la suivante :
 
 ![Architecture finale](../figures/multi-container.png)
 
-Avant de ce lancer, nous allons voir comment faire en sorte que deux conteneurs puissent communiquer ensemble.
+Avant de vous lancer, nous allons voir comment faire en sorte que deux conteneurs puissent communiquer ensemble.
 
 - Cloner ce dépôt : `git clone https://github.com/hreymond/VIR/`
 - Entrer dans le répertoire du TD3 : `cd TD3-multi-containers`

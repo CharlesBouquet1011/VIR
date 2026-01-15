@@ -54,7 +54,7 @@ Pour définir des variable d'environnement nécessaires à l'application, on uti
 
 Enfin, on définit la commande qui sera utilisée pour lancer notre application, ici `flask run --host=0.0.0.0`.
 
-:question: Peut-on se passer de l'instruction WORKDIR ?
+:question: Peut-on se passer de l'instruction WORKDIR ?   
 :question: Peut-on se passer du repertoire /app ?
 
 ## Comprendre les couches (layers)
@@ -83,11 +83,11 @@ La construction de la couche `COPY . .` est relancée car un des fichiers copié
 
 # À vous de jouer !
 ## Validation du développement initial
-Les sources du logiciel "SuperDB" sont dans le répertoire SuperDB.
+Les sources du logiciel "SuperDB" sont dans le répertoire SuperDB.    
 Sans utiliser podman, faire tourner l'application utilisant superDB. 
 
 - Pour cela, il faut utiliser les environnements de virtualisation python (venv), 
-- lancer l'application python du dernier TD, 
+- Lancer l'application python du dernier TD, 
 - Testez l'application 
 
 L'important est de comprendre les commandes à passer pour faire fonctionner votre application.
