@@ -20,15 +20,15 @@ Avant de vous lancer, nous allons voir comment faire en sorte que deux conteneur
 Pour comprendre comment fonctionne le réseau, nous utiliserons la troisième version du site, dont l'image Docker contient des utilitaires réseau (ping, ip, ifconfig)
 
 - Changer de dossier `cd website` 
-- Construire l'image `website:v3` : `docker build . -t website:v3`
+- Construire l'image `website:v3` : `podman build . -t website:v3`
 
 Ensuite, nous allons tenter de ping un conteneur depuis un autre : 
 
-- Créer un conteneur de `website:v3`, en mode interactif nommé A : `docker run -it --rm --name A website:v3`
-- Dans un autre terminal, créer un autre conteneur nommé B : `docker run -it --rm --name B website:v3`
+- Créer un conteneur de `website:v3`, en mode interactif nommé A : `podman run -it --rm --name A website:v3`
+- Dans un autre terminal, créer un autre conteneur nommé B : `podman run -it --rm --name B website:v3`
 
 Vous obtiendrez alors un terminal à l'intérieur du conteneur A et du conteneur B.
-À partir de là, récuperer l'adresse IP de B et faire un ping de A vers B.
+À partir de là, récuperer les addresses IP des deux conteneurs. Quelles sont vos conclusions...
 
 ## Mise en réseau de conteneurs
 
@@ -36,40 +36,38 @@ Vous obtiendrez alors un terminal à l'intérieur du conteneur A et du conteneur
 >
 > **Mise en réseau de conteneurs**
 >
-> Conteneurs ont besoin d'accéder à internet. 
-> Les nouveaux conteneurs rejoignent le sous-réseau par défaut de podman, nommé `podman`. C'est grâce à ce sous réseau qu'il est possible de ping une machine depuis une autre.
-> 
-> En pratique, lorsque l'on cherche à connecter plusieurs conteneurs, on évite d'utiliser le réseau par défaut et on préfère créer un nouveau réseau.
-> 
-> En effet, si tous les conteneurs partagent le même réseau, cela présente des problématiques de sécurité.
-> Dans l'exemple ci-dessous, deux application A et B partagent le même réseau. Si l'application B est compromise, cela représente une faille pour l'application A.
+> Les conteneurs ont besoin d'accéder à internet, ils possèdent donc une adresse réseau qui est routée vers l'extérieur. Mais pour des raisons d'isolation le routage vers un conteneur n'existe pas.
 >
-> ![Isolation réseau](../figures/isolation_reseau.png) 
+> Pour cela vous devez inscrire votre conteneur dans un réseau spécifique géré par podman. Les commandes `podman network ls` `podman network inspect <network_name>` vous permet de voir leur description. 
 > 
-> De plus, le réseau par défaut de podman ne contient pas de DNS, et ce dernier nous serait utile pour accéder aux conteneurs par le nom, plutôt que leurs IPs.
 > 
-> Pour gérer le réseau avec podman, on utilise la commande `podman network`.
-> 
-> - `podman network ls` : Liste les réseaux existants
-> - `podman network inspect <network_name>` : Inspecte les propriétés du réseau network_name
-> - `podman network create <network_name>` : Crée un nouveau réseau, appelé network_name
-> 
+:question: Que pouvez-vous constater sur la configuration actuelle ?
 
 - Arrêter les conteneurs A et B (Utiliser Ctrl-D ou taper la commande `exit`) 
-- Créer un nouveau réseau `website-net`
-- Dans deux terminaux différents, créer deux conteneurs A et B, qui se connectent au réseau nouvellement créé (paramètre `--network`) :
-    - `docker run -it --network website-net --rm --name A website:v3`.
-    - `docker run -it --network website-net --rm --name B website:v3`
+- Dans deux terminaux différents, créer deux conteneurs A et B, qui se connectent au réseau disponible  (paramètre `--network`) :
+    - `docker run -it --network <nom> --rm --name A website:v3`.
+    - `docker run -it --network <nom> --rm --name B website:v3`
 - Dans un autre terminal, créer un conteneur C, qui n'est pas connecté à `website-net` :  `docker run -it --rm --name C website:v3`
-
 - Afficher les ips de chacun des conteneurs. On observe que A et B sont sur les mêmes sous-réseaux, et C sur un autre.
 
 Vérifier que :
-- Le conteneur A peut accéder au conteneur B via son ip
+- Le conteneur A peut pinguer le conteneur B via son ip
 - Le conteneur C ne peut accéder ni à A, ni à B
 
+> En effet, si tous les conteneurs partagent le même réseau, cela présente une surface d'attaque de sécurité.
+>
+> ![Isolation réseau](../figures/isolation_reseau.png) 
+
+:question: Vous avez nommé vos deux conteneurs A et B, sauriez-vous retrouver ces noms dans le conteneur ? Histoire de savoir comment je m'appelle ?
+
+A ce stade, vous pouvez donc pinguer le conteneur A et le conteneur B par leur addresse IP. Mais pas leur nom.
+
+> Le réseau par défaut de podman n'offre pas un support DNS (`dns_enabled: false`), et ce dernier nous serait utile pour accéder aux conteneurs par le nom, plutôt que leurs IPs.
+
+Si vous créez un nouveau réseau `website-net`, vous pourrez constater que sa valeur dns_enabled est true. 
+
 Notre sous réseau `website-net` fourni un DNS par défaut. Verifier qu'il est désormais possible :
-- Que le conteneur A accède au conteneur B via son ID (accessible via `docker ps`)
+- Que le conteneur A accède au conteneur B via son ID (accessible via `podman ps`)
 - Que le conteneur A accède au conteneur B via le nom du conteneur : `ping B`
 
 # TODO 
@@ -77,3 +75,11 @@ Notre sous réseau `website-net` fourni un DNS par défaut. Verifier qu'il est d
 - [ ] Ajouter liaison Postgresql
 - [ ] Ajouter docker-compose
 - [ ] Demander extensions à 4 -> Connecter le frontend au voisins
+
+
+# Liste des commandes utilisées
+```
+podman run -it --rm --name <nom> <tag> --> A quoi correspondent les options utilisées
+podman network
+ping
+```
