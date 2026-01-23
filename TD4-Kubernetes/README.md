@@ -22,9 +22,9 @@ Dans ce cadre, le gestionnaire doit fonctionner comme tâche de fond du système
 
 L'installation que nous avons fait de k3s, est une installation sans démarrage automatique du service. La commande d'installation initiale que nous avons réalisé sur la clé est donc `INSTALL_K3S_SKIP_ENABLE=true ./install-k3.sh`. Les variables disponibles pour k3s sont [ici](https://docs.k3s.io/reference/env-variables). Le service existe, mais il n'est pas démarré comme un service. Dans le cadre du cours, nous n'allons pas l'utiliser comme un service mais directement dans une fenêtre en appelant le shell `startk3sServer.sh`.
 
-:question: Ouvrez le shell et vérifier la commande
-:question: Démarrez le shell et vérifiez que les logs fonctionnent
-:question: Arrêter le processus k3s en faisant un CTRL-C dans la fenêtre
+:question: Ouvrez le shell et vérifier la commande   
+:question: Démarrez le shell et vérifiez que les logs fonctionnent   
+:question: Arrêter le processus k3s en faisant un CTRL-C dans la fenêtre   
 
 Nous ne passons pas par un service, car toutes les actions précédente sont plus complexes en passant par systemd. Mais sauriez-vous les retrouver ?
 
@@ -63,7 +63,7 @@ Si vous n'êtes pas certain d'avoir tout arrêté proprement, k3s vous fournit u
 ### Un premier déploiement
 Nous pouvons maintenant tester un premier déploiement d'une application. Le fichier suivant donne la description d'un deploiement. Le fichier est au format yaml, prenez le temps de lire les différents élements et de vérifier que la syntaxe vous parait claire. Par exemple, à quoi sert le `-` en début de certaines section ?
 
-:question: Selon vous, que fait cette description ? D'une manière spécifique, avez-vous bien identifié le lien avec Docker ?
+:question: Selon vous, que fait cette description ? Par exemple, avez-vous identifié un lien avec Docker ?
 
 ```yaml
 # Simple application with service
@@ -111,13 +111,12 @@ deployment.apps/demo-app created
 service/demo-service created
 ```
 
-Vous pouvez vérifier plusieurs choses. Combien de réplicats du service ont-ils été déployés ?
-`kubectl get pods`
+Vous pouvez vérifier plusieurs choses.
 
+- Combien de réplicats du service ont-ils été déployés ?  `kubectl get pods`
 Modifiez le nombre de replicats dans le descripteur et vérifiez que le nombre de replicats est adapté. 
 
-Vérifiez que le service est bien installé.
-`kubectl get services`
+- Vérifiez que le service est bien installé.  `kubectl get services`
 
 ### Utilisation
 En utilisant la commande `kubectl describe service <nom-service>`, essayez de trouver comment accéder à un des réplicats de serveur Web. 
@@ -152,14 +151,3 @@ kubectl describe service <nom-service>
 
 critctl ps
 ```
-
-# Liste des packages contenant des utilitaires utiles
-```
-  netstat --> net-tools
-  ps --> procps
-``` 
-
-# Pour le root et ses cheat sheets
-https://gist.github.com/rxaviers/7360908
-
-
