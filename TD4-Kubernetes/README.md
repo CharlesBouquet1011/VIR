@@ -119,13 +119,21 @@ Modifiez le nombre de replicats dans le descripteur et vérifiez que le nombre d
 Vérifiez que le service est bien installé.
 `kubectl get services`
 
+### Utilisation
 En utilisant la commande `kubectl describe service <nom-service>`, essayez de trouver comment accéder à un des réplicats de serveur Web. 
 
-:question: Comment pouvez-vous tester ce déployement. 
+:question: Comment pouvez-vous tester ce déployement ?
+
+La commande `kubectl describe <descripteur> <nom>` permet d'obtenir une description de tous les artefacts déployés dans votre infrastructure. Vous pouvez, par exemple l'utiliser pour consulter la description d'un des pods. 
+
+### critctl
+La commande `critctl` est une commande équivalente à la commande `podman` ou `docker`. Elle permet de consulter l'état des conteneur et des images de votre cluster Kube. 
+Par exemple `critcl ps` liste l'état de vos conteneurs. 
+
+:question: Sauriez vous modifier un de vos replicats et vérifier qu'un de vos site web affiche quelque chose de différent ?
 
 
-
-
+A cette étapes quelles sont vos analyse de Kubernetes par rapport à Docker, voyez-vous des éléments de similitude ou de différence ?
 
 
 # Liste des commandes utiles
@@ -142,6 +150,7 @@ kubectl get pods -A
 kubectl get services
 kubectl describe service <nom-service>
 
+critctl ps
 ```
 
 # Liste des packages contenant des utilitaires utiles
