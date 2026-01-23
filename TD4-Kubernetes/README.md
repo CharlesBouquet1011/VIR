@@ -14,11 +14,25 @@ l'implantation spécifique utilisée (ici k3s).
 ### Démarrer k3s
 k3s est présent sur la clé. Vous allez donc pouvoir le lancer et le manipuler. Mais avant cela il faut comprendre la notion de services. 
 
-L'objectif de Kubernetes est de fournir une infrastructure d'exploitation (Run) large échelle offrant des garanties d'exécution 24/7. Pour cela, l'infrastructure fonctionne de manière autonome et va se placer au dessus de votre système d'exploitation comme le ferrait une machine virtuelle. On peut assimiler cela à un gestionnaire de machines virtuelles, a la différence que la granularité d'exploitation n'est pas une machine mais un conteneur au sens de docker. 
+L'objectif de Kubernetes est de fournir une infrastructure d'exploitation (Run) large échelle offrant des garanties d'exécution 24/7. Pour cela, l'infrastructure fonctionne de manière autonome et va se placer au dessus de votre système d'exploitation comme le ferait une machine virtuelle. On peut assimiler cela à un gestionnaire de machines virtuelles, a la différence que la granularité d'exploitation n'est pas une machine mais un conteneur au sens de Docker. 
+Le schéma suivant illustre les objectifs de Kubernetes.
+```mermaid
+graph TB
+    A[Container Orchestration] --> B[Kubernetes]
 
-Dans ce cadre, le gestionnaire doit fonctionner comme tâche de fond du système d'exploitation. Tous les systèmes d'exploitation (Linux, Windows, Mac) offrent une (ou plusieurs) applications de gestion des tâches de fond. Il s'agit des 'services windows' dans windows https://fr.wikipedia.org/wiki/Service_(Windows), du système lauchnd sous macos. Sous Linux de nombreuses propositions ont étés faites, car il s'agit d'un enjeu majeur du bon fonctionnement des systèmes d'exploitation. Un gestionnaire de service doit pouvoir lancer et arrêter un service, le surveiller ou bien encore définir s'il doit être lancé systématiquement au démarrage ou uniquement selon des besoins spécifiques. Enfin, avant de pouvoir le lancer, il est nécessaire de vérifier que les services, les drivers ou les processus dont ils dépend sont disponibles. Lancer un 'service' n'est pas simple et c'est pourquoi les outils de gestion de services ne sont pas si simples qu'ils n'y parraissent. Debian utilise [systemd](https://medium.com/@sebastiancarlos/systemds-nuts-and-bolts-0ae7995e45d3) comme remplaçant à initd (Une excellente présentation des systèmes d'init peut se trouver [ici](https://hal.science/inria-00155663/) quoi qu'elle date un peu). Systemd repose sur les commande systemctl ou journalctl disponibles sur votre machine. Par exemple la commande `systemctl list-unit-files` liste les services et leur état actuel. La commande `journalctl -uf <nomdeservice>`permet de suivre les traces de logs d'un service. 
+    B --> C[Automated Deployment]
+    B --> D[Scaling]
+    B --> E[Management]
+    B --> F[Self-healing]
 
-:question: Utilisez `journalctl` pour tracer l'activité de ssh, et montrez que vous obtenez des traces. 
+    style B fill:#326ce5,color:white
+```
+
+
+
+Dans ce cadre, le gestionnaire doit fonctionner comme tâche de fond du système d'exploitation. Tous les systèmes d'exploitation (Linux, Windows, Mac) offrent une (ou plusieurs) applications de gestion de ces tâches de fond. Il s'agit des [Services windows](https://fr.wikipedia.org/wiki/Service_(Windows)) dans windows ou du système `launchd` sous Macos. Sous Linux/Unix il en existe plusieurs en fonction de la distribution utilisée. Un gestionnaire de service doit pouvoir lancer, arrêter et surveiller un service. Par ailleurs, il doit pouvoir définir s'il doit être lancé systématiquement au démarrage ou uniquement selon des besoins spécifiques. Enfin, avant de pouvoir lancer un service, il est nécessaire de vérifier que les services, les drivers ou les processus dont ils dépend sont disponibles. Lancer un 'service' n'est pas simple et c'est pourquoi les outils de gestion de services ne sont pas si simples qu'ils n'y parraissent. Debian utilise [systemd](https://medium.com/@sebastiancarlos/systemds-nuts-and-bolts-0ae7995e45d3) comme remplaçant à initd (Une excellente présentation des systèmes d'init peut se trouver [ici](https://hal.science/inria-00155663/) quoi qu'elle date un peu). Lorsque vous démarrez votre clé USB, vous voyez rapidement les différents services se lancer. Systemd repose sur les commande `systemctl` ou `journalctl` disponibles sur votre machine. Par exemple la commande `systemctl list-unit-files` liste les services et leur état actuel. La commande `journalctl -uf <nomdeservice>`permet de suivre les traces de logs d'un service. 
+
+:question: Utilisez `journalctl` pour tracer l'activité de ssh, et montrez que vous obtenez des traces sur certaines actions. 
 
 L'installation que nous avons fait de k3s, est une installation sans démarrage automatique du service. La commande d'installation initiale que nous avons réalisé sur la clé est donc `INSTALL_K3S_SKIP_ENABLE=true ./install-k3.sh`. Les variables disponibles pour k3s sont [ici](https://docs.k3s.io/reference/env-variables). Le service existe, mais il n'est pas démarré comme un service. Dans le cadre du cours, nous n'allons pas l'utiliser comme un service mais directement dans une fenêtre en appelant le shell `startk3sServer.sh`.
 
@@ -32,7 +46,6 @@ Nous ne passons pas par un service, car toutes les actions précédente sont plu
 :boom: A partir de maintenant vous allez travailler en root sur votre machine. Dans chaque fenêtre, vous pouvez faire un `sudo su -` pour basculer en mode admin. 
 
 Une fois k3s lancé dans une fenêtre dédiée, vous pouvez vérifier que tout s'est bien lancé en lançant les commandes suivantes dans une nouvelle fenêtre. (Certaines commandes ne sont pas indiquées vous devez les trouver par vous même). Pensez-bien à les effectuer en tant qu'admin, mais n'hésitez-pas à les tester en tant qu'utilisateur standard pour voir s'il y a un message d'erreur. 
-
 
 ```
 kubectl cluster-info /* Vous indique l'état du cluster, vous devriez voir l'adresse du controle-pane, du service core-DNS, et du serveur de metriques. */
@@ -59,6 +72,11 @@ Normalement à cette étape votre système kubernetes fonctionne. Il est prêt �
 
 
 Si vous n'êtes pas certain d'avoir tout arrêté proprement, k3s vous fournit un script de nettoyage complet `k3s-killall.sh` réalise un message assez complet de k3s. 
+
+
+
+
+
 
 ### Un premier déploiement
 Nous pouvons maintenant tester un premier déploiement d'une application. Le fichier suivant donne la description d'un deploiement. Le fichier est au format yaml, prenez le temps de lire les différents élements et de vérifier que la syntaxe vous parait claire. Par exemple, à quoi sert le `-` en début de certaines section ?
