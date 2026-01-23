@@ -29,6 +29,35 @@ L'installation que nous avons fait de k3s, est une installation sans démarrage 
 Nous ne passons pas par un service, car toutes les actions précédente sont plus complexes en passant par systemd. Mais sauriez-vous les retrouver ?
 
 
+:boom: A partir de maintenant vous allez travailler en root sur votre machine. Dans chaque fenêtre, vous pouvez faire un `sudo su -` pour basculer en mode admin. 
+
+Une fois k3s lancé dans une fenêtre dédiée, vous pouvez vérifier que tout s'est bien lancé en lançant les commandes suivantes dans une nouvelle fenêtre. (Certaines commandes ne sont pas indiquées vous devez les trouver par vous même). Pensez-bien à les effectuer en tant qu'admin, mais n'hésitez-pas à les tester en tant qu'utilisateur standard pour voir s'il y a un message d'erreur. 
+
+
+```
+kubectl cluster-info /* Vous indique l'état du cluster, vous devriez voir l'adresse du controle-pane, du service core-DNS, et du serveur de metriques. */
+```
+
+Vous avez compris, que `kubectl` est la CLI d'interaction avec kubernetes. Elle ne dépend pas de k3s, mais de la spécification générale. C'est par cette interface que vous pouvez passez la majorité de vos instructions en ligne de commande. Notez également que nous avons installé la complétion des commande pour kubectl quand vous tapez `kubectl <TAB><TAB>`, vous avez la suggestion des mots clés suivants. 
+
+```
+kubectl get nodes /* Vous indique les noeuds participants à votre cluster */
+---> debian Ready control-pane 3m v1.34.3+k3s1 indique que j'ai un noeud debian actif
+```
+
+```
+kubectl get pods    /* Renvoie une liste vide */
+kubectl get pods -A /* Renvoie une liste de pods, dont 2 'non prêt' *./
+```
+Nous reviendrons là dessus, mais les deux commandes diffèrent, car à l'instar de votre machine, vous avez un mode 'user-space' et un mode 'system'. Le paramètre `-A` accède à l'intégralité des informations. 
+
+Il vous reste deux commandes à passer. La première regarde les processus lancés et actifs. La seconde regarde la partie réseau... Au fait, connaissiez-vous la partie réseau avant de démarre kubernetes ? 
+
+:question: Quelles sont les commandes à soumettre ?
+
+Normalement à cette étape votre système kubernetes fonctionne. Il est prêt à exécuter de nouveaux services. Nous vous suggérons de rebooter votre machine pour voir si vous atteignez ce point sans difficulté. 
+
+### Un premier déploiement
 
 
 
@@ -40,6 +69,12 @@ Vous pouvez maintenant cloner le projet git https://github.com/hreymond/VIR et v
 ```
 systemctl list-unit-files
 journalctl -uf <nomdeservice>
+
+kubectl cluster-info
+kubectl get nodes
+kubectl get pods
+kubectl get pods -A
+
 ```
 
 # Liste des packages contenant des utilitaires utiles
