@@ -57,23 +57,90 @@ Il vous reste deux commandes à passer. La première regarde les processus lanc�
 
 Normalement à cette étape votre système kubernetes fonctionne. Il est prêt à exécuter de nouveaux services. Nous vous suggérons de rebooter votre machine pour voir si vous atteignez ce point sans difficulté. 
 
+
+Si vous n'êtes pas certain d'avoir tout arrêté proprement, k3s vous fournit un script de nettoyage complet `k3s-killall.sh` réalise un message assez complet de k3s. 
+
 ### Un premier déploiement
+Nous pouvons maintenant tester un premier déploiement d'une application. Le fichier suivant donne la description d'un deploiement. Le fichier est au format yaml, prenez le temps de lire les différents élements et de vérifier que la syntaxe vous parait claire. Par exemple, à quoi sert le `-` en début de certaines section ?
+
+:question: Selon vous, que fait cette description ? D'une manière spécifique, avez-vous bien identifié le lien avec Docker ?
+
+```yaml
+# Simple application with service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: demo
+  template:
+    metadata:
+      labels:
+        app: demo
+    spec:
+      containers:
+      - name: web
+        image: nginx:1.19
+        ports:
+        - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-service
+spec:
+  selector:
+    app: demo
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+```
+
+Pour installer cette description vous pouvez déclarer un ou deux fichiers de description. Le séparateur `---` permet de séparer deux descriptions qui sont traitées de manière indépendante. Pour déployer une description l'instruction est `kubectl apply -f <fichierdescripton.yaml>`.
+
+Si tout s'est bien passé, vous pouvez vérifier que la déclaration s'est bien réalisé avec les constats et instructions suivantes : 
+
+Le résultat de l'appel devrait être  :
+```
+deployment.apps/demo-app created
+service/demo-service created
+```
+
+Vous pouvez vérifier plusieurs choses. Combien de réplicats du service ont-ils été déployés ?
+`kubectl get pods`
+
+Modifiez le nombre de replicats dans le descripteur et vérifiez que le nombre de replicats est adapté. 
+
+Vérifiez que le service est bien installé.
+`kubectl get services`
+
+En utilisant la commande `kubectl describe service <nom-service>`, essayez de trouver comment accéder à un des réplicats de serveur Web. 
+
+:question: Comment pouvez-vous tester ce déployement. 
 
 
 
-### Environnnement de travail
 
-Vous pouvez maintenant cloner le projet git https://github.com/hreymond/VIR et vous rendre dans le repertoire TD1-Docker.
+
 
 # Liste des commandes utiles
 ```
 systemctl list-unit-files
 journalctl -uf <nomdeservice>
 
+k3s-killall.sh
+
 kubectl cluster-info
 kubectl get nodes
 kubectl get pods
 kubectl get pods -A
+kubectl get services
+kubectl describe service <nom-service>
 
 ```
 
