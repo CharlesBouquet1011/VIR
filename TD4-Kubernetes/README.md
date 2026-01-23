@@ -160,18 +160,17 @@ La commande `kubectl describe <descripteur> <nom>` permet d'obtenir une descript
 La commande `critctl` est une commande équivalente à la commande `podman` ou `docker`. Elle permet de consulter l'état des conteneur et des images de votre cluster Kube. 
 Par exemple `critcl ps` liste l'état de vos conteneurs. 
 
-:question: Sauriez vous modifier un de vos replicats et vérifier qu'un de vos site web affiche quelque chose de différent ?
-
+:question: Sauriez vous modifier un de vos replicats en le forçant à afficher une page simple, puis vérifier qu'un de vos site web affiche quelque chose de différent ?
 
 ### kubectl run
-:question: Que fait la commande suivante `kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- curl demo-service ?
+:question: Que fait la commande suivante `kubectl run curl --image=curlimages/curl -i --rm --restart=Never -- curl demo-service` ?
 
 A partir de ce que vous avez compris de crictl, lancez un `curl demo-service` sur un des pods. 
 
 ### Quelques dernières commandes à tester
-`kubectl describe pod <pod-name>` 
-`kubectl logs <pod-name>`, vérifiez que vos serveurs web ont bien fonctionné.
-`kubectl exec -it <pod-name> -- <cmd>`, testez que la commande curl existe, puis lancez la commande `curl demo-service`sur un des pods ngnix. 
+`kubectl describe pod <pod-name>`    
+`kubectl logs <pod-name>`, vérifiez que vos serveurs web ont bien fonctionné.  
+`kubectl exec -it <pod-name> -- <cmd>`, testez que la commande curl existe, puis lancez la commande `curl demo-service`sur un des pods ngnix.    
 
 A cette étapes quelles sont vos analyse de Kubernetes par rapport à Docker, voyez-vous des éléments de similitude ou de différence ?
 
@@ -181,6 +180,9 @@ Vous pouvez supprimer des Objets Kubernetes avec la commande `kubectl delete <ob
 :question: Listez vos pod, supprimez un des pods actifs, et re-listez vos pods. Que se passe-t'il ?
 
 La commande `kubectl get all` permet de lister tout ce qui tourne sur la machine. 
+Pour fini la commande `kubectl top pod` vous permet de voir l'espace utilisé par chacun de vos pods.
+
+---> SI VOUS ETES ARRIVEZ ICI, C'EST PARFAIT !
 
 # Liste des commandes utiles
 ```
