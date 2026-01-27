@@ -1,7 +1,8 @@
 # Get base image 
 FROM python:3.14-slim
 
-COPY . .
+
+COPY . /app
 
 WORKDIR /app
 
