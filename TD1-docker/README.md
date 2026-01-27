@@ -71,7 +71,7 @@ Dans le répertoire `website`
 > Pour rendre le serveur accessible depuis l'extérieur du conteneur, il est nécessaire faire une redirection de port (_port-forwarding_ en anglais). L'objectif est que le réseau trafic entrant sur le port 5010 de notre machine soit redirigé vers le port 5000 du conteneur. Pour cela, on doit relancer notre conteneur.
 
 - Arrêter le conteneur Ctrl-c
-- Relancer en ajoutant la redirection de port :  `podman run -p 5000:5010 website`.
+- Relancer en ajoutant la redirection de port :  `podman run -p 5010:5000 website`.
 
 Testez maintenant votre application. Quelle application utilisez vous ?
 Soyez fin, et testez dans les détails :
