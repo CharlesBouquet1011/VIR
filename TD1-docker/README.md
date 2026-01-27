@@ -105,7 +105,7 @@ Le site enregistre les statistiques des requêtes effectués dans un fichier nom
 - Par ailleurs avez-vous repéré la quantité de mémoire utilisé par vos manipulation ?
 
 ### Persistance des données
-- Démarrer un nouveau conteneur : `podman run -d -p 5000:5010 website`. Est-ce que le fichier `queried_names.json` est toujours présent dans le conteneur ?
+- Démarrer un nouveau conteneur : `podman run -d -p 5010:5000 website`. Est-ce que le fichier `queried_names.json` est toujours présent dans le conteneur ?
 
 > [!NOTE]
 >
