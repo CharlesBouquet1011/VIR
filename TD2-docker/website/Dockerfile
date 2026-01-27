@@ -1,9 +1,9 @@
 # Get base image 
 FROM python:3.14-slim
 
-COPY . .
-
 WORKDIR /app
+
+COPY . .
 
 # Add instructions to build the SuperDB binary
 
