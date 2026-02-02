@@ -132,18 +132,48 @@ Définissez le déploiement et le service dont le conteneur `traefik/whoami` à 
 
 Lorsqu'il est invoqué ce conteneur répond de la manière suivante : 
 ```sh
-curl xx.xx.xx.xx
+curl xx.xx.xx.xxx
 
-wxwx
-wx
-wxw
-xwxw
+Hostname: whoami-712342182-8tv2h
+IP: 127.0.0.1
+IP: ::1
+...
+
 ```
-
 Si le déploiement fonctionne, vous pouvez maintenant définir un service `whomami` permettant d'y accéder via une IP unique. Notez que pour l'instant le nom sert juste à identifier les objets dans l'infra kube.
 
 Gardez une copie de vos fichiers de déploiement et de service...
 
+### Route d'accès
+Lorsque vous ête sur k3s, il existe au moins 3 manières pour définir des routes d'accès au services. Les Ingress, les IngressRoute et la GatewayAPI.    
+- Les Ingress sont définis par Kubernetes, mais ne sont plus limité et conservés pour des raisons historiques.    
+- Les IngressRoute sont spécifiqus à Traefik. Elles reposent sur les Objets Kube Ingress et sont utilisés par exemple pour le dashboard que vous venez d'utiliser. 
+- La GatewayApi répond aux nouveaux besoins et à la spécification poussée par Kubernetes. Nous passerons donc par la GatewayAPI pour consulter à distance notre service whoami. 
+
+
+Le fichier de configuration type est le suivant : 
+```yaml
+# httproute.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: whoami
+spec:
+  parentRefs:
+    - name: traefik-gateway
+  hostnames:
+    - "whoami-gatewayapi.localhost"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: whoami
+          port: 80
+```
+
+Créez ce fichier et installez le sur votre serveur. Si tout se passse bien vous devriez voir votre dashboard se mettre à jour d'une nouvelle configuration.
 
 
 
