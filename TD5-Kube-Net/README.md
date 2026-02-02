@@ -65,6 +65,91 @@ Enfin remettez 6 replicas et vérifiez que votre description de service colle bi
 
 Listez les endpointslices.
 
+## Partie 2 : Accès distant
+Afin de mettre à disposition une application il faut passer par un gestionnaire de trafic. K3s repose sur [traefik](https://doc.traefik.io/traefik/).
+Elle semble avoir quelques soucis et nous suggérons de ne pas l'installer par défaut en utilisant l'option `--disable=traefik` puis d'installer la dernière version après démarrage.
+
+### Installation de traefik
+Pour utiliser traefik nous allons suivre le [tutoriel standard](https://doc.traefik.io/traefik/getting-started/kubernetes/) en passant par helm. C'est un gestionnaire de déploiement pour Kube.   
+Les commandes pour installer la dernière version de traefik sont les suivantes : 
+
+```sh
+sudo su -
+export KUBECONFIG=/etc/rancher/k3s/k3s.yaml # Cette instruction indique à helm la configuration pour dialoguer avec kubernetes
+helm repo add traefik https://traefik.github.io/charts # Cette instruction indique les repository helm utilisés. C'est la même technique que pour les repo apt
+helm repo update
+```
+
+Pour installer traefik, nous allons lui préciser un environnement spécifique. L'environnement peut être indiqué par des options de lancement, ou dans un fichier de description yaml.   
+Le fichier suivant contient les paramètres de démarrage de traefik. 
+
+```yaml
+# values.yaml
+ingressRoute:
+  dashboard:
+    enabled: true
+    matchRule: Host(`dashboard.localhost`)
+    entryPoints:
+      - web
+providers:
+  kubernetesGateway:
+    enabled: true
+gateway:
+  listeners:
+    web:
+      namespacePolicy:
+        from: All
+```
+
+Ce fichier indique que traefik présente un dashboard accessible via une `ingressRoute` et que l'utilisation des accès via `GatewayAPI` sera également possible. 
+
+Installez traefik avec la commande suivante : `helm install traefik traefik/traefik -f values.yaml --wait`  
+Verifiez rapidement l'installation avec la commande `kubectl describe GatewayClass traefik`    
+
+:warning: Attention il faut réfléchir 2s.   
+Enfin assurez-vous d'accèder au dashboard [http://dashboard.localhost/dashboard/](http://dashboard.localhost/dashboard/).
+
+Si vous accèdez à un dashboard, vous pouvez aller vers la suite.
+
+### Mise à disposition de service
+Si traefik est installé et que la GatewayClass est active, vous pouvez déclarer de nouveau accès à des services.
+
+Nous vous proposons d'utiliser deux services pour tester deux techniques d'accès. Les IngressRoute et la GatewayAPI. 
+
+Définir un service. Pour rappel un service est un point d'accès unique interne (via une IP fixe) sur un `replicas set` de conteneurs. (Méditez bien cette phrase).    
+
+
+Pour mettre un service à disposition, il faut décrire le déploiement du conteneur répliqué ainsi que le service qui 'stabilise' le replicas set.
+
+Définissez le déploiement et le service dont le conteneur `traefik/whoami` à la description suivante :  
+
+```yaml
+- name: whoami
+  image: traefik/whoami
+  ports:
+    - containerPort: 80 
+```
+
+Lorsqu'il est invoqué ce conteneur répond de la manière suivante : 
+```sh
+curl xx.xx.xx.xx
+
+wxwx
+wx
+wxw
+xwxw
+```
+
+Si le déploiement fonctionne, vous pouvez maintenant définir un service `whomami` permettant d'y accéder via une IP unique. Notez que pour l'instant le nom sert juste à identifier les objets dans l'infra kube.
+
+Gardez une copie de vos fichiers de déploiement et de service...
+
+
+
+
+
+
+
 
 
 # Liste des commandes utiles
