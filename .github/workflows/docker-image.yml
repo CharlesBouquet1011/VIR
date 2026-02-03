@@ -15,4 +15,4 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker build ./TD2-docker/website  --tag ghcr.io/CharlesBouquet1011/VIR1:1 && docker push ghcr.io/CharlesBouquet1011/VIR1:1
+      run: docker build ./TD2-docker/website  --tag ghcr.io/charlesbouquet1011/VIR1:1 && docker push ghcr.io/charlesbouquet1011/VIR1:1
