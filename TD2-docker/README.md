@@ -106,14 +106,9 @@ Si vous souhaitez améliorer l'image actuelle, vous pouvez accomplir ces tâches
 
 - Add an HealthCheck to your website : https://docs.docker.com/reference/dockerfile/#healthcheck
 - Do not expose port manually, instead use the EXPOSE command : https://docs.docker.com/reference/dockerfile/#expose et https://docs.docker.com/get-started/docker-concepts/running-containers/publishing-ports/
-- Run performance tests on the V1 and V2 versions <TODO quels outils ?  >
 - Mettre en place de l'intégration continue : faire un fork de ce dépôt sur github ou gitlab, et faire en sorte que chaque nouveau commit sur `main` déclenche la création de l'image docker de website. 
   - Sur github, en utilisant les github actions : [https://docs.github.com/en/actions/get-started/understand-github-actions](https://docs.github.com/en/actions/get-started/understand-github-actions)
   - Sur gitlab, en utilisant une pipeline de CI/CD : [https://docs.gitlab.com/ci/](https://docs.gitlab.com/ci/)
-
-# TODO TP
-
-- [ ] Regarder les outils de stress test simples d'utilisation qui existent
 
 # Liste des commandes utilisées
 ```
