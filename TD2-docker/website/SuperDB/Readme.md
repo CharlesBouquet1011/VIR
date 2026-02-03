@@ -13,7 +13,7 @@ Voila un exemple d'exécution du programme
 Pour compiler l'application, il est nécessaire d'installer `gcc` et `make`.
 
 - `apt update`
-- `apt install -y gcc make`
+- `apt install -y gcc make libc6-dev`
 
 ## Compilation
 
