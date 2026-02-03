@@ -11,16 +11,4 @@ Un serveur pour afficher le skin d'un joueur minecraft : entrer le nom d'utilisa
 
 # Installation de SuperDB
 
-## Dépendances
-
-Pour compiler l'application, il est nécessaire d'installer `gcc` et `make`.
-
-- `apt update`
-- `apt install -y gcc make`
-
-## Compilation
-
-Pour compiler le binaire, exécutez `make` dans le répertoire `SuperDB` pour produire le binaire `SuperDBExe`
-
-- `cd SuperDB`
-- `make`
+Voir le fichier Readme.md dans le dossier SuperDB
