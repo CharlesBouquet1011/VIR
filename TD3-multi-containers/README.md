@@ -1,4 +1,4 @@
-# TP3 Multi-conteneurs et docker compose
+# TD3 Multi-conteneurs et docker compose
 
 Jusqu'à présent notre superbe site se reposait sur un fichier JSON ou l'outil SuperDB pour stocker ses données.
 
