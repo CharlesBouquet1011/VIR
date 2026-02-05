@@ -176,10 +176,10 @@ spec:
 Créez ce fichier et installez le sur votre serveur. Si tout se passse bien vous devriez voir votre dashboard se mettre à jour d'une nouvelle configuration.
 
 
+Vous pouvez tester l'accès à votre application de votre machine. Mais surtout vous pouvez tester l'application à partir d'une autre machine. 
 
-
-
-
+Cherchez l'option `curl` vous permettant de tester directaion via l'IP.
+Utilisez l'outil `ab` pour tester la machine du voisin. 
 
 
 # Liste des commandes utiles
@@ -201,4 +201,8 @@ crictl exec -it <contenerId> /bin/bash
 
 echo "xxx" > /usr/share/nginx/html/index.html
 
+helm repo update
+helm uninstall <xxx>
+helm install <xxx>
+curl -H "Host: whoami-gatewayapi2.toto" 10.56.171.180 
 ```
