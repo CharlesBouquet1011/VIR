@@ -25,7 +25,11 @@ def get_db_connection() -> psycopg2.connection:
                                         'username varchar (150) NOT NULL,'
                                         'nb_query integer  NOT NULL)'
                                         )
-        cur.execute("ALTER TABLE stats ADD CONSTRAINT stats_username_unique UNIQUE (username);")
+        # Prevent duplicates usernames
+        cur.execute("""
+            CREATE UNIQUE INDEX IF NOT EXISTS stats_username_uq
+            ON stats (username);
+        """)
         cur.close()
     conn.commit()
 
@@ -99,7 +103,7 @@ def update_query_count(username) -> int:
         return 0
 
     conn = get_db_connection()
-    stat_row = []
+    nb_query = None
     with conn.cursor() as cur:
         cur.execute(
             """
@@ -111,16 +115,10 @@ def update_query_count(username) -> int:
             """,
             (username,)
         )
-        if cur.rowcount == 0:
-            print(f"[ERROR] No entries for username just updated : {username}")
-            return 0
-        if cur.rowcount > 1:
-            print(f"[WARNING] {cur.rowcount} entries for the same username : {username}")
-        stat_row = cur.fetch_one()
+    
+        nb_query = cur.fetchone()
 
     conn.commit()
+    
     # Return query count
-    # 
-    # Stats
-    # ID username query_count
-    return stat_row[2]
+    return nb_query[0]

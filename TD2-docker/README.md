@@ -86,8 +86,12 @@ La construction de la couche `COPY . .` est relancée car un des fichiers copié
 Les sources du logiciel "SuperDB" sont dans le répertoire SuperDB.    
 Sans utiliser podman, faire tourner l'application utilisant superDB. 
 
-- Pour cela, il faut utiliser les environnements de virtualisation python (venv), 
-- Lancer l'application python du dernier TD, 
+Pour cela, il faut 
+- Compiler le logiciel SuperDB (lire le Readme.md du dossier SuperDB)
+- Mettre en place un environnements de virtualisation python (venv) : 
+  - `python3 -m venv venv`
+  - `source venv/bin/activate`
+- Installer les dépendances du site, et lancer le site. Pour ce faire, on pourra s'inspirer du Dockerfile analysé plus haut dans le TD.
 - Testez l'application 
 
 L'important est de comprendre les commandes à passer pour faire fonctionner votre application.

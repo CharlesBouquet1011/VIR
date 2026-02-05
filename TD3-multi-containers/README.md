@@ -1,4 +1,4 @@
-# TP3 Multi-conteneurs et docker compose
+# TD3 Multi-conteneurs et docker compose
 
 Jusqu'à présent notre superbe site se reposait sur un fichier JSON ou l'outil SuperDB pour stocker ses données.
 
@@ -31,9 +31,9 @@ Vous obtiendrez alors un terminal à l'intérieur du conteneur A et du conteneur
 
 :question: À quoi correspondent chacune des options que vous avez indiqué à `podman run` ? 
 
-Afficher la configuration IP des deux conteneurs. 
+Afficher la configuration IP de l'hôte et des deux conteneurs. 
 
-:question: À partir de cette configuration que pouvez-vous conclure ? 
+:question: À partir de cette configuration que pouvez-vous conclure ? La communication réseau entre les conteneurs est-elle possible ?
 
 ## Mise en réseau de conteneurs
 
@@ -41,11 +41,15 @@ Afficher la configuration IP des deux conteneurs.
 >
 > **Mise en réseau de conteneurs**
 >
-> À leur création, les conteneurs rejoignent un réseau pour obtenir un accès Internet. Ils peuvent effectuer des connexions sortantes (accès à Internet), mais les connexions entrantes (de l'hôte vers le conteneur) sont bloquées. 
+> Par défaut, les conteneurs peuvent effectuer des connexions sortantes (accès à Internet), mais les connexions entrantes (de l'hôte vers le conteneur) sont bloquées. 
 >
 > :question: Quel paramètre, utilisé lors de la création du conteneur, permet d'autoriser les connexions entrantes sur un port spécifique ?
+> 
+> Selon la configuration réseau de podman, un nouveau conteneur :
+> - se connectera à un réseau par défaut, `podman`,
+> - ou utilisera directement l'adresse de l'hôte
 >
-> Au démarrage de podman, il n'existe qu'un seul réseau, nommé `podman`. Par défaut, c'est le réseau que rejoindront les conteneurs à leur création.
+> :question: Quel est votre cas ?
 >
 > Podman laisse à l'utilisateur la possibilité de créer et de gérer de nouveaux réseaux :
 > - `podman network ls` : Lister les réseaux existants
@@ -76,15 +80,14 @@ Afficher la configuration IP des deux conteneurs.
 Pour prendre en main ces problématique réseau, nous allons mettre en place l'isolation de deux conteneurs A et B du réseau de base, `podman`
 
 - Arrêter les conteneurs A et B (Utiliser Ctrl-D ou taper la commande `exit`) 
-- Créer un nouveau réseau `safe-net`
-- Dans deux terminaux différents, créer deux conteneurs A et B, qui se connectent au réseau disponible  (paramètre `--network`) :
-    - `docker run -it --network <nom> --rm --name A website:v3 bash`.
-    - `docker run -it --network <nom> --rm --name B website:v3 bash`
-- Dans un autre terminal, créer un conteneur C, qui n'est pas connecté à `website-net` :  `docker run -it --rm --name C website:v3 bash`
-
-- Inspecter le nouveau réseau `safe-net`
+- Créer un nouveau réseau `safe-net` et inspecter-le
 
 :question: Quelles différences pouvez-vous faire entre le réseau de base, et votre réseau `safe-net` ? Qu'est-ce que cela implique ?
+
+- Dans deux terminaux différents, créer deux conteneurs A et B, qui se connectent au réseau disponible  (paramètre `--network`) :
+    - `docker run -it --network <nom> --rm --name A website:v3 bash`
+    - `docker run -it --network <nom> --rm --name B website:v3 bash`
+- Dans un autre terminal, créer un conteneur C, qui n'est pas connecté à `website-net` :  `docker run -it --rm --name C website:v3 bash`
 
 :question: Vous avez nommé vos deux conteneurs A et B, sauriez-vous retrouver ces noms dans le conteneur ? Histoire de savoir comment je m'appelle ?
 
@@ -112,7 +115,7 @@ Le site essaiera de se connecter à la base de donnée avec ces paramètres :
 > 
 > Par exemple, postgres demande à l'utilisateur de définir la variable d'environnement `POSTGRES_PASSWORD` au lancement de la base de donnée
 
-Démarrer deux conteneurs à partir des images suivantes : `postgres` (notre base de donnée) et `website` (notre site). Faire en sorte que notre site puisse se connecter à la base de donnée postgres.
+Démarrer deux conteneurs à partir des images suivantes : `postgres` (notre base de donnée) et `website` (notre site). Faire en sorte que notre site puisse se connecter à la base de donnée postgres. Comme précédemment, on se connectera au site via le port 5010.
 
 :question: Comment vérifier que notre conteneur `website` soit sur le même réseau que le conteneur `postgres` ? Comment vérifier qu'il est possible d'accéder au conteneur via le nom de domaine `postgres` ? 
 
@@ -128,7 +131,7 @@ Démarrer de multiples conteneurs à la main comme nous l'avons fait est source 
 >
 > L'outil `podman compose` permet de lancer et paramétrer plusieurs conteneurs à partir d'un fichier descriptif, nommé `compose.yaml`
 >
-> Voici un exemple de `compose.yaml`
+> Voici un exemple de `compose.yaml` pour notre déploiement
 > 
 >```yaml
 >services:
